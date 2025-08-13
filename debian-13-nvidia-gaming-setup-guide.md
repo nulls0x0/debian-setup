@@ -33,7 +33,7 @@ sudo apt update
 
 ### Install kernel headers and build tools
 ```bash
-sudo apt install linux-headers-$(uname -r) build-essential dkms -y
+sudo apt install linux-headers-amd64 linux-headers-$(uname -r) build-essential dkms -y
 ```
 
 ### Install NVIDIA Open driver
@@ -99,3 +99,41 @@ sudo reboot
 sudo sysctl vm.swappiness=10
 echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 ```
+
+# Troubleshooting
+
+### Uh oh, did your video stop working after a Kernel Update?
+
+It can be a bit of a shock when your video doesn't work after updating your system. This usually happens because the Nvidia driver's Kernel modules need a little nudge to rebuild for your new Kernel. Don't worry, we can walk you through the steps to get things back up and running!
+
+First things first, let's get you to your system's command line. You have a couple of options here:
+
+*   **SSH to the rescue!** If you have an SSH server set up on your computer and another device handy, you can simply SSH in.
+*   **No SSH? No problem!** You can also try switching to a different tty session. Once your system has booted up to the point where it seems stuck, just press **(CTRL + ALT + F2)**. This should bring up a text-based login prompt where you can enter your username and password to get to the command line.
+
+Now that you're in, let's make sure your kernel headers are installed and up to date. This is an important step for building the new modules.
+
+```bash
+sudo apt update
+sudo apt install linux-headers-amd64 linux-headers-$(uname -r) -y
+```
+
+Next, let's ensure you have the necessary tools for the job, including the wonderful Kernel module update tool (DKMS).
+
+```bash
+sudo apt install build-essential dkms -y
+```
+
+With everything in place, it's time to rebuild your Nvidia Kernel Modules for your current Kernel. This one simple command should do the trick!
+
+```bash
+sudo dkms autoinstall
+```
+
+All that's left is to reboot your computer so it can load the shiny new Nvidia driver.
+
+```bash
+sudo reboot
+```
+
+And that's it! Hopefully, your video is now working perfectly.
