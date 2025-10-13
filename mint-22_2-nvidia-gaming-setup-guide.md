@@ -61,6 +61,29 @@ nvidia-smi
 sudo apt install steam-installer -y
 ```
 
+### ProtonUp-Qt
+- Manage Proton-GE and other compatibility tools for Steam:
+```bash
+flatpak install flathub net.davidotek.pupgui2 -y
+```
+
+# System tweaks
+
+### Enable CPU Performance Governor
+
+For better gaming performance, you can set your CPU governor to performance mode:
+```bash
+# Install cpufrequtils
+sudo apt install cpufrequtils -y
+
+# Set to performance mode (temporary - until reboot)
+sudo cpufreq-set -g performance
+
+# To make it permanent, edit the config file:
+echo 'GOVERNOR="performance"' | sudo tee /etc/default/cpufrequtils > /dev/null
+sudo systemctl restart cpufrequtils
+```
+
 ### Installing Gamemode for on-demand performance
 Gamemode automatically optimizes system performance when games are running.
 ```bash
@@ -94,15 +117,6 @@ gamemoded -s
 
 This will show you the status and which processes are currently using gamemode.
 
-### Install Useful Gaming Tools
-
-**ProtonUp-Qt** - Manage Proton-GE and other compatibility tools for Steam:
-```bash
-flatpak install flathub net.davidotek.pupgui2 -y
-```
-
-# System tweaks
-
 ### Set Maximum Refresh Rate for Your Display
 
 Ensuring your display is set to its maximum refresh rate is crucial for smooth gaming. Higher refresh rates provide a better gaming experience with reduced input lag and smoother motion.
@@ -124,27 +138,6 @@ Mouse acceleration can negatively impact gaming performance, especially in FPS g
 3. Under the **Mouse** tab
 4. Under **Acceleration** set it to **Constant**
 
-### Enable CPU Performance Governor (Optional)
-
-For better gaming performance, you can set your CPU governor to performance mode:
-```bash
-# Install cpufrequtils
-sudo apt install cpufrequtils -y
-
-# Set to performance mode (temporary - until reboot)
-sudo cpufreq-set -g performance
-
-# To make it permanent, edit the config file:
-echo 'GOVERNOR="performance"' | sudo tee /etc/default/cpufrequtils > /dev/null
-sudo systemctl restart cpufrequtils
-```
-
-### Makes the system prefer using RAM over disk swap
-```bash
-sudo sysctl vm.swappiness=10
-echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
-```
-
 ### Disable Compositing for Full Screen Applications (Cinnamon)
 
 Disabling the compositor for full screen applications can significantly improve gaming performance by reducing input lag and increasing FPS. This is especially beneficial for fast-paced games.
@@ -155,6 +148,12 @@ Disabling the compositor for full screen applications can significantly improve 
    - ☑ **"Disable compositing for full-screen windows"**
 
 **Note:** After enabling this setting, the compositor will automatically disable when you run games or applications in full screen mode, and re-enable when you exit. This provides the best of both worlds - smooth desktop effects when needed, and maximum performance during gaming.
+
+### Makes the system prefer using RAM over disk swap
+```bash
+sudo sysctl vm.swappiness=10
+echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
+```
 
 # Troubleshooting
 
