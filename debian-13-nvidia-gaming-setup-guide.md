@@ -99,8 +99,9 @@ sudo flatpak install -y flathub net.davidotek.pupgui2
 
 # System tweaks
 
-### Install Latest Kernel from backports when available
-List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/
+### Install Latest Kernel from backports
+- Linux Kernel 6.17.8 is available as of December 6, 2025.
+- List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
 ```bash
 sudo apt update
 sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
