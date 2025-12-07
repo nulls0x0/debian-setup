@@ -102,6 +102,9 @@ echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 ```
 
 ## Enable NTSYNC Kernel Module
+- Updated: December 6, 2025
+- Prerequisite: The NTSYSNC kernel module is not available with the Debian 13 base Kernel (6.12). You must install the backported Kernel first using the instructions above.
+
 The ntsync (NT Synchronization Primitive) kernel module is a specialized driver for Linux 
 designed to significantly improve the performance and compatibility of Windows applications, 
 particularly games, when run through Proton and Wine.
