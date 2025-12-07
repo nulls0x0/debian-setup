@@ -1,6 +1,6 @@
 # General Gaming Setup for Debian 13 "Trixie"
 
-This guide is tailored for users running **Debian 13 "Trixie"**. Please replace placeholders like `<YOUR_USERNAME>` and `<your_home_folder>` with your actual username and home directory path.
+This guide is tailored for users running **Debian 13 "Trixie"**.
 
 # Nvidia Drivers Install
 
@@ -16,17 +16,18 @@ sudo apt update && sudo apt upgrade -y
 ```
 
 ### Add Nvidia GPG Key
-We use the Nvidia Debian 12 repo until Nvidia publishes a repo for Debian 13
+- Updated: December 6, 2025
 ```bash
 sudo apt install curl -y # Ensure curl is installed
-curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/3bf863cc.pub | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nvidia-cuda.gpg
+curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64/8793F200.pub | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nvidia-cuda.gpg
 
 sudo apt update
 ```
 
 ### Add NVIDIA repo
+- Updated: December 6, 2025
 ```bash
-echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-cuda.list
+echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-cuda.list
 
 sudo apt update
 ```
@@ -98,6 +99,22 @@ sudo reboot
 ```bash
 sudo sysctl vm.swappiness=10
 echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
+```
+
+## Enable NTSYNC Kernel Module
+The ntsync (NT Synchronization Primitive) kernel module is a specialized driver for Linux 
+designed to significantly improve the performance and compatibility of Windows applications, 
+particularly games, when run through Proton and Wine.
+
+To enable the kernel module to load at boot:
+```bash
+echo 'ntsync' | sudo tee /etc/modules-load.d/ntsync.conf
+
+# Loads the module immediately without a reboot
+sudo modprobe ntsync
+
+# Verify the module is loaded
+lsmod | grep ntsync
 ```
 
 # Troubleshooting
