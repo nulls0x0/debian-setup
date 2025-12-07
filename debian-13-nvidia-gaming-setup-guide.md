@@ -2,6 +2,8 @@
 
 This guide is tailored for users running **Debian 13 "Trixie"**.
 
+Official Nvidia Driver Install Guide: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/index.html
+
 # Nvidia Drivers Install
 
 **Important:** Disable secure boot in your bios. If you use Secure Boot, you might need to enroll MOK keys for the NVIDIA modules. Refer to the Debian Wiki for "Secure Boot" if you encounter issues after driver installation.
@@ -36,12 +38,22 @@ sudo apt update
 ```bash
 sudo apt install linux-headers-amd64 linux-headers-$(uname -r) build-essential dkms -y
 ```
+## Identify Correct Nvidia Driver
+Based on the model of your Nvidia GPU you must install either the Nvidia "Open" or "Proprietary" driver. Do not install both drivers at the same time.
+- If you have an Nvidia Turing based GPU or newer i.e. (Geforce 16XX, 20XX, 30XX, 40XX, 50XX...), you should use the Nvidia "Open" driver.
+- If you have an Nvidia GPU with an architecture older than Turing i.e. (Geforce 10XX, 9XX ...) you should use the Nvidia "Proprietary" driver.
 
-### Install NVIDIA Open driver
+### How To Install NVIDIA "Open" driver
 nvidia-open: NVIDIA Driver meta-package, Open GPU kernel modules, latest version Meta-package containing all the available packages related to the NVIDIA driver.modules.
 
 ```bash
 sudo apt install nvidia-open -y
+```
+### How To Install NVIDIA "Proprietary" driver
+We rely on two packages for the older GPU architectures. See: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/debian.html#desktop-only-system
+
+```bash
+sudo apt install nvidia-driver nvidia-kernel-dkms -y
 ```
 
 ### Reboot
