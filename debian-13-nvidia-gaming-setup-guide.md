@@ -1,6 +1,8 @@
 # General Gaming Setup for Debian 13 "Trixie"
 
-This guide is tailored for users running **Debian 13 "Trixie"**. Please replace placeholders like `<YOUR_USERNAME>` and `<your_home_folder>` with your actual username and home directory path.
+This guide is tailored for users running **Debian 13 "Trixie"**.
+
+Official Nvidia Driver Install Guide: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/index.html
 
 # Nvidia Drivers Install
 
@@ -16,17 +18,18 @@ sudo apt update && sudo apt upgrade -y
 ```
 
 ### Add Nvidia GPG Key
-We use the Nvidia Debian 12 repo until Nvidia publishes a repo for Debian 13
+- Updated: December 6, 2025
 ```bash
 sudo apt install curl -y # Ensure curl is installed
-curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/3bf863cc.pub | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nvidia-cuda.gpg
+curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64/8793F200.pub | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/nvidia-cuda.gpg
 
 sudo apt update
 ```
 
 ### Add NVIDIA repo
+- Updated: December 6, 2025
 ```bash
-echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-cuda.list
+echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64/ /" | sudo tee /etc/apt/sources.list.d/nvidia-cuda.list
 
 sudo apt update
 ```
@@ -35,12 +38,22 @@ sudo apt update
 ```bash
 sudo apt install linux-headers-amd64 linux-headers-$(uname -r) build-essential dkms -y
 ```
+## Identify Correct Nvidia Driver
+Based on the model of your Nvidia GPU you must install either the Nvidia "Open" or "Proprietary" driver. Do not install both drivers at the same time.
+- If you have an Nvidia Turing based GPU or newer i.e. (Geforce 16XX, 20XX, 30XX, 40XX, 50XX...), you should use the Nvidia "Open" driver.
+- If you have an Nvidia GPU with an architecture older than Turing i.e. (Geforce 10XX, 9XX ...) you should use the Nvidia "Proprietary" driver.
 
-### Install NVIDIA Open driver
+### How To Install NVIDIA "Open" driver
 nvidia-open: NVIDIA Driver meta-package, Open GPU kernel modules, latest version Meta-package containing all the available packages related to the NVIDIA driver.modules.
 
 ```bash
 sudo apt install nvidia-open -y
+```
+### How To Install NVIDIA "Proprietary" driver
+We rely on two packages for the older GPU architectures. See: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/debian.html#desktop-only-system
+
+```bash
+sudo apt install nvidia-driver nvidia-kernel-dkms -y
 ```
 
 ### Reboot
@@ -86,8 +99,9 @@ sudo flatpak install -y flathub net.davidotek.pupgui2
 
 # System tweaks
 
-### Install Latest Kernel from backports when available
-List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/
+### Install Latest Kernel from backports
+- Linux Kernel 6.17.8 is available as of December 6, 2025.
+- List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
 ```bash
 sudo apt update
 sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
@@ -98,6 +112,25 @@ sudo reboot
 ```bash
 sudo sysctl vm.swappiness=10
 echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
+```
+
+## Enable NTSYNC Kernel Module
+- Updated: December 6, 2025
+- Prerequisite: The NTSYSNC kernel module is not available with the Debian 13 base Kernel (6.12). You must install the backported Kernel first using the instructions above.
+
+The ntsync (NT Synchronization Primitive) kernel module is a specialized driver for Linux 
+designed to significantly improve the performance and compatibility of Windows applications, 
+particularly games, when run through Proton and Wine.
+
+To enable the kernel module to load at boot:
+```bash
+echo 'ntsync' | sudo tee /etc/modules-load.d/ntsync.conf
+
+# Loads the module immediately without a reboot
+sudo modprobe ntsync
+
+# Verify the module is loaded
+lsmod | grep ntsync
 ```
 
 # Troubleshooting
