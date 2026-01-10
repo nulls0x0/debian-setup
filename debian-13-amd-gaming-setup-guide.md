@@ -4,7 +4,7 @@ This guide is tailored for users running **Debian 13 "Trixie"** with AMD Radeon 
 
 # AMD Radeon Drivers Install
 
-**Note:** AMD Radeon drivers (AMDGPU) are included in the Linux kernel. This section focuses on installing updayed graphics libraries for optimal gaming performance.
+**Note:** AMD Radeon drivers (AMDGPU) are included in the Linux kernel. This section focuses on installing updated graphics libraries for optimal gaming performance.
 
 Reboot the system before installing the drivers (especially if you just updated the kernel).
 
@@ -28,7 +28,7 @@ sudo reboot
 
 ### Install Latest Mesa 3d Lib from backports
 ```bash
-sudo apt install mesa-utils
+sudo apt install mesa-utils -y
 glxinfo | grep "OpenGL version"
 
 sudo apt install -t trixie-backports \
@@ -38,13 +38,14 @@ sudo apt install -t trixie-backports \
     libegl-mesa0 \
     mesa-va-drivers \
     mesa-vdpau-drivers \
-    firmware-amd-graphics
+    firmware-amd-graphics \
+    -y
 
 glxinfo | grep "OpenGL version"
 ```
 
 ## Enable NTSYNC Kernel Module
-- Prerequisite: The NTSYSNC kernel module is not available with the Debian 13 base Kernel (6.12). You must install the backported Kernel first using the instructions above.
+- Prerequisite: The NTSYNC kernel module is not available with the Debian 13 base Kernel (6.12). You must install the backported Kernel first using the instructions above.
 
 The ntsync (NT Synchronization Primitive) kernel module is a specialized driver for Linux 
 designed to significantly improve the performance and compatibility of Windows applications, 
@@ -63,7 +64,7 @@ lsmod | grep ntsync
 
 ## Verify non-free video codecs
 ```bash
-sudo apt install vainfo
+sudo apt install vainfo -y
 vainfo
 ```
 
@@ -75,7 +76,7 @@ sudo apt install steam-installer -y
 ### Install Google Chrome
 ```bash
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb -y
 ```
 
 ## Chrome Browser: Hardware Accelerated Video
