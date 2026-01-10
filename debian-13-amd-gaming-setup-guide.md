@@ -218,3 +218,29 @@ To enable gamemode for your Steam games, you need to add a launch option to each
 sudo sysctl vm.swappiness=10
 echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 ```
+
+# Build and Install Gamescope
+```bash
+mkdir ~/gamescope-backport && cd ~/gamescope-backport
+
+# As of current versions, the command would look like this:
+dget -u https://deb.debian.org/debian/pool/contrib/g/gamescope/gamescope_3.16.15-2.dsc
+
+cd gamescope-*/
+
+mk-build-deps
+sudo apt install ./gamescope-build-deps_*.deb
+
+# If apt warns about missing packages, run: sudo apt --fix-broken install
+
+# -uc, -us: Skip GPG signing (unnecessary for personal use)
+dpkg-buildpackage -b -uc -us
+
+sudo apt install ../gamescope_*.deb
+
+# For gamescope to run smoothly without stuttering, it needs permission to set "High Priority"
+
+sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
+
+sudo apt autoremove gamescope-build-deps
+```
