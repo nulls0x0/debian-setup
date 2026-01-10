@@ -220,27 +220,46 @@ echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 ```
 
 # Build and Install Gamescope
+Gamescope is a micro-compositor that can improve gaming performance by providing better frame pacing and allowing games to run at different resolutions than your display. Building from source ensures you get the latest features and optimizations.
+
+**Prerequisite:** This process requires build tools. If you followed the kernel installation steps earlier, these should already be installed.
+
+### Install build prerequisites
+```bash
+sudo apt install devscripts build-essential -y
+```
+
+### Download and build gamescope
 ```bash
 mkdir ~/gamescope-backport && cd ~/gamescope-backport
 
-# As of current versions, the command would look like this:
+# Download the gamescope source package
 dget -u https://deb.debian.org/debian/pool/contrib/g/gamescope/gamescope_3.16.15-2.dsc
 
 cd gamescope-*/
 
+# Create and install build dependencies
 mk-build-deps
-sudo apt install ./gamescope-build-deps_*.deb
+sudo apt install ./gamescope-build-deps_*.deb -y
 
 # If apt warns about missing packages, run: sudo apt --fix-broken install
 
-# -uc, -us: Skip GPG signing (unnecessary for personal use)
+# Build the package (-uc, -us: Skip GPG signing for personal use)
 dpkg-buildpackage -b -uc -us
 
-sudo apt install ../gamescope_*.deb
+# Install the built package
+sudo apt install ../gamescope_*.deb -y
+```
 
-# For gamescope to run smoothly without stuttering, it needs permission to set "High Priority"
-
+### Configure gamescope for high priority scheduling
+For gamescope to run smoothly without stuttering, it needs permission to set "High Priority":
+```bash
 sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
+```
 
-sudo apt autoremove gamescope-build-deps
+### Cleanup build files
+```bash
+cd ~
+sudo apt autoremove gamescope-build-deps -y
+rm -rf ~/gamescope-backport
 ```
