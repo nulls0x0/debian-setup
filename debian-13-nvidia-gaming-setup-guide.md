@@ -17,6 +17,15 @@ sudo dpkg --add-architecture i386
 sudo apt update && sudo apt upgrade -y
 ```
 
+### Install Latest Kernel from backports
+- Linux Kernel 6.17.8 is available as of December 6, 2025.
+- List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
+```bash
+sudo apt update
+sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
+sudo reboot
+```
+
 ### Add Nvidia GPG Key
 - Updated: December 6, 2025
 ```bash
@@ -75,9 +84,34 @@ sudo dmesg | grep nvidia
 sudo apt install steam-installer -y
 ```
 
-### Installing Gamemode for on-demand performance
+### Install Google Chrome
 ```bash
-sudo apt install gamemode -y
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb -y
+```
+
+## Chrome Browser: Hardware Accelerated Video
+To help reduce power usage and make our system more efficient when watching video using Chrome, we must add some launch options.
+
+**Manual Method:**
+```bash
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
+nano ~/.local/share/applications/google-chrome.desktop
+```
+Look for the lines starting with `Exec=` and add these launch options after `google-chrome-stable`:
+```
+--enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs
+```
+
+**Scripted Method:**
+```bash
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
+FILE_PATH=~/.local/share/applications/google-chrome.desktop
+FLAGS=" --enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs"
+sed -i 's/ --enable-features=[^ ]*//g' "$FILE_PATH"
+sed -i "s/^\(Exec=.*google-chrome-stable\)\(.*\)/\1${FLAGS}\2/g" "$FILE_PATH"
 ```
 
 ### Install Flatpak
@@ -89,24 +123,103 @@ sudo apt install flatpak plasma-discover-backend-flatpak -y
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 ```
 
-### Install OBS Studio and ProtonUp-Qt
-Use KDE Discover to install apps from Flatpak
+### ProtonUp-Qt (Flatpak)
+1. Open **Discover Software Manager**
+2. In the search input enter **proton**
+3. Select the **ProtonUp-Qt** Flatpak (From Flathub) package
+4. Click **Install**
 
-### How to install an App from the command line
+### Minecraft Launcher 'Prism Launcher' (Flatpak)
+1. Open **Discover Software Manager**
+2. In the search input enter **prism**
+3. Select the **Prism Launcher** Flatpak (From Flathub) package
+4. Click **Install**
+
+### Roblox Launcher 'Sober' (Flatpak)
+1. Open **Discover Software Manager**
+2. In the search input enter **sober**
+3. Select the **Sober** Flatpak (From Flathub) package
+4. Click **Install**
+
+### OBS Studio (Flatpak)
+1. Open **Discover Software Manager**
+2. In the search input enter **obs**
+3. Select the **OBS Studio** Flatpak (From Flathub) package
+4. Click **Install**
+
+# KDE Desktop Tweaks
+### Set Maximum Refresh Rate for Your Display
+
+Ensuring your display is set to its maximum refresh rate is crucial for smooth gaming. Higher refresh rates provide a better gaming experience with reduced input lag and smoother motion.
+
+1. Open **System Settings**
+2. Go to **Display & Monitor**
+3. Select your monitor
+4. Under **Refresh rate**, select the highest available option (e.g., 144 Hz, 165 Hz, 240 Hz)
+5. Click **Apply**
+
+### Enable Variable Refresh Rate (G-Sync/G-Sync Compatible)
+
+To enable variable refresh rates for your games. This works with NVIDIA G-Sync and G-Sync Compatible displays.
+
+1. Open **System Settings**
+2. Go to **Display & Monitor**
+3. Select your gaming monitor
+4. Under **Adaptive sync**, select the **Automatic** or **Always** option
+5. Under **Screen tearing** check **Allow in fullscreen windows**
+6. Click **Apply**
+
+Automatic: 
+Adaptive Sync is only enabled when an opaque fullscreen window is in focus. This is typically a full-screen game or a full-screen video player. Adaptive Sync will not be active for windowed games, desktop navigation, or other non-fullscreen content.
+
+Always:
+Adaptive Sync is permanently enabled. The display's refresh rate will constantly adjust to match the frame rate of the entire screen, including desktop elements, windows, and video content. It can cause the screen to noticeably flicker or feel sluggish with low-framerate content.
+
+### Disable Mouse Acceleration
+
+Mouse acceleration can negatively impact gaming performance, especially in FPS games where precise aim is crucial. Disabling it provides consistent 1:1 mouse movement.
+
+1. Open **System Settings**
+2. Go to **Mouse and Touchpad**
+3. Select **Mouse**
+4. Select your mouse in the **Device** drop down
+5. Un-check the **Enable pointer acceleration** check box
+6. Click **Apply**
+
+### Enable CPU Performance Governor
+
+For better gaming performance, you can set your CPU governor to performance mode:
+
+1. On the Taskbar left click **Show hidden icons** arrow
+2. Open **Power Management**
+3. Move the **Power Profile** slider to **Performance**
+
+### Installing Gamemode for on-demand performance
 ```bash
-sudo flatpak install -y flathub net.davidotek.pupgui2
+sudo apt install gamemode -y
 ```
+
+Verify gamemode is working correctly:
+```bash
+gamemoded -t
+```
+
+If the test passes, gamemode is ready to use. The daemon will automatically apply CPU governor optimizations, I/O priority adjustments, and other performance tweaks when activated.
+
+### Enable Gamemode for Steam Games
+To enable gamemode for your Steam games, you need to add a launch option to each game:
+
+**For Individual Games:**
+1. Open your Steam Library
+2. Right-click on the game you want to optimize
+3. Select **Properties**
+4. In the **Launch Options** field, add:
+   ```
+   gamemoderun %command%
+   ```
+5. Close the properties window and launch the game
 
 # System tweaks
-
-### Install Latest Kernel from backports
-- Linux Kernel 6.17.8 is available as of December 6, 2025.
-- List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
-```bash
-sudo apt update
-sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
-sudo reboot
-```
 
 ### Makes the system prefer using RAM over disk swap
 ```bash
@@ -131,6 +244,82 @@ sudo modprobe ntsync
 
 # Verify the module is loaded
 lsmod | grep ntsync
+```
+
+# Build and Install Gamescope
+Gamescope is a micro-compositor that can improve gaming performance by providing better frame pacing and allowing games to run at different resolutions than your display. Building from source ensures you get the latest features and optimizations.
+
+### Install build prerequisites
+```bash
+sudo apt install devscripts build-essential -y
+```
+
+### Download and build gamescope
+```bash
+mkdir ~/gamescope-backport && cd ~/gamescope-backport
+
+# Download the gamescope source package
+dget -u https://deb.debian.org/debian/pool/contrib/g/gamescope/gamescope_3.16.15-2.dsc
+
+cd gamescope-*/
+
+# Install backported libgbm-dev dependency
+sudo apt install -t trixie-backports libgbm-dev -y
+
+# Create and install build dependencies
+mk-build-deps
+sudo apt install ./gamescope-build-deps_*.deb -y
+
+# If apt warns about missing packages, run: sudo apt --fix-broken install
+
+# Build the package (-uc, -us: Skip GPG signing for personal use)
+dpkg-buildpackage -b -uc -us
+
+# Install the built package
+sudo apt install ../gamescope_*.deb -y
+```
+
+### Configure gamescope for high priority scheduling
+For gamescope to run smoothly without stuttering, it needs permission to set "High Priority":
+```bash
+sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
+```
+
+### Cleanup build files
+```bash
+cd ~
+sudo apt autoremove gamescope-build-deps -y
+rm -rf ~/gamescope-backport
+```
+
+# Setup Gamescope Session
+Clone https://github.com/shahnawazshahin/steam-using-gamescope-guide
+
+Run installer
+```bash
+git clone https://github.com/shahnawazshahin/steam-using-gamescope-guide
+
+cd steam-using-gamescope-guide
+
+sudo ./installer.sh
+```
+
+Install Mangohud 
+```bash
+sudo apt install mangohud goverlay mangoapp -y
+```
+
+Update the gamescope-session with the correct monitor resolution and refresh rate.
+```bash
+sudo nano /usr/bin/gamescope-session
+```
+
+Find the `gamescope` command and update the resolution and refresh rate to match your monitor:
+```bash
+gamescope \
+    $MANGOAPP_FLAG \
+    -W 2560 -H 1440 -w 2560 -h 1440 -r 165 --adaptive-sync \
+    -e -- steam -steamdeck -steamos3
 ```
 
 # Troubleshooting
