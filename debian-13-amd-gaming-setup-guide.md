@@ -33,12 +33,19 @@ glxinfo | grep "OpenGL version"
 
 sudo apt install -t trixie-backports \
     mesa-vulkan-drivers \
+    mesa-vulkan-drivers:i386 \
     libgl1-mesa-dri \
+    libgl1-mesa-dri:i386 \
     libglx-mesa0 \
+    libglx-mesa0:i386 \
     libegl-mesa0 \
+    libegl-mesa0:i386 \
     mesa-va-drivers \
+    mesa-va-drivers:i386 \
     mesa-vdpau-drivers \
+    mesa-vdpau-drivers:i386 \
     firmware-amd-graphics \
+    firmware-amd-graphics:i386 \
     -y
 
 glxinfo | grep "OpenGL version"
@@ -238,6 +245,10 @@ dget -u https://deb.debian.org/debian/pool/contrib/g/gamescope/gamescope_3.16.15
 
 cd gamescope-*/
 
+
+sudo apt install -t trixie-backports libgbm-dev
+
+
 # Create and install build dependencies
 mk-build-deps
 sudo apt install ./gamescope-build-deps_*.deb -y
@@ -262,4 +273,32 @@ sudo setcap 'CAP_SYS_NICE=eip' $(which gamescope)
 cd ~
 sudo apt autoremove gamescope-build-deps -y
 rm -rf ~/gamescope-backport
+```
+
+# Setup Gamescope Session
+Clone https://github.com/shahnawazshahin/steam-using-gamescope-guide
+
+Run installer
+```bash
+git clone https://github.com/shahnawazshahin/steam-using-gamescope-guide
+
+cd steam-using-gamescope-guide
+
+sudo ./installer.sh
+```
+
+Install Mangohud 
+```bash
+sudo apt install mangohud goverlay mangoapp -y
+```
+
+Update the gamescope-session with the correct monitor resolution and refresh rate.
+```bash
+sudo nano /usr/bin/gamescope-session
+
+
+gamescope \
+    $MANGOAPP_FLAG \
+    -W 2560 -H 1440 -w 2560 -h 1440 -r 165 --adaptive-sync \
+    -e -- steam -steamdeck -steamos3
 ```
