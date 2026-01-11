@@ -293,6 +293,8 @@ rm -rf ~/gamescope-backport
 ```
 
 # Setup Gamescope Session
+Setup the display manager (login screen) to add a login option to launch Steam into SteamOS mode using Gamescope. This enables you to run your Steam games without the overhead of a full desktop environment like KDE or Gnome.
+
 Clone https://github.com/shahnawazshahin/steam-using-gamescope-guide
 
 Run installer
