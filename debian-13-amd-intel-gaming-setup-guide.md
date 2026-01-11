@@ -64,12 +64,24 @@ sudo apt install -t trixie-backports \
 ```bash
 # Intel VA-API driver for hardware video acceleration
 sudo apt install -t trixie-backports \
+    firmware-intel-graphics \
+    firmware-intel-graphics:i386 \
+    -y
+
+sudo apt install \
     intel-media-va-driver \
     intel-media-va-driver:i386 \
     -y
 
 # For older Intel GPUs (Broadwell and earlier), use the legacy driver instead:
-# sudo apt install -t trixie-backports i965-va-driver i965-va-driver:i386 -y
+# sudo apt install i965-va-driver i965-va-driver:i386 -y
+```
+
+## Verify Hardware Video Acceleration
+This verifies that VA-API hardware video acceleration is working for your AMD or Intel GPU.
+```bash
+sudo apt install vainfo -y
+vainfo
 ```
 
 ## Enable NTSYNC Kernel Module
@@ -88,13 +100,6 @@ sudo modprobe ntsync
 
 # Verify the module is loaded
 lsmod | grep ntsync
-```
-
-## Verify Hardware Video Acceleration
-This verifies that VA-API hardware video acceleration is working for your AMD or Intel GPU.
-```bash
-sudo apt install vainfo -y
-vainfo
 ```
 
 # Gaming Setup
