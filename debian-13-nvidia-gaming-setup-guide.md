@@ -22,7 +22,12 @@ sudo apt update && sudo apt upgrade -y
 - List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
 ```bash
 sudo apt update
-sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
+
+sudo apt install -t trixie-backports \
+    linux-image-amd64 linux-headers-amd64 \
+    firmware-linux firmware-linux-nonfree \
+    -y
+
 sudo reboot
 ```
 
