@@ -1,10 +1,10 @@
-# AMD Radeon Gaming Setup for Debian 13 "Trixie"
+# AMD & Intel Gaming Setup for Debian 13 "Trixie"
 
-This guide is tailored for users running **Debian 13 "Trixie"** with AMD Radeon graphics cards.
+This guide is tailored for users running **Debian 13 "Trixie"** with **AMD Radeon** or **Intel** graphics.
 
-# AMD Radeon Drivers Install
+# GPU Drivers Install
 
-**Note:** AMD Radeon drivers (AMDGPU) are included in the Linux kernel. This section focuses on installing updated graphics libraries for optimal gaming performance.
+**Note:** Both AMD Radeon (AMDGPU) and Intel (i915/xe) drivers are included in the Linux kernel. This section focuses on installing updated Mesa graphics libraries for optimal gaming performance.
 
 Reboot the system before installing the drivers (especially if you just updated the kernel).
 
@@ -24,13 +24,14 @@ sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
 sudo reboot
 ```
 
-## AMD Drivers Update
+## Mesa Drivers Update
 
-### Install Latest Mesa 3d Lib from backports
+### Install Latest Mesa 3D Libraries from backports
 ```bash
 sudo apt install mesa-utils -y
 glxinfo | grep "OpenGL version"
 
+# Core Mesa packages (required for both AMD and Intel)
 sudo apt install -t trixie-backports \
     mesa-vulkan-drivers \
     mesa-vulkan-drivers:i386 \
@@ -44,11 +45,31 @@ sudo apt install -t trixie-backports \
     mesa-va-drivers:i386 \
     mesa-vdpau-drivers \
     mesa-vdpau-drivers:i386 \
-    firmware-amd-graphics \
-    firmware-amd-graphics:i386 \
     -y
 
 glxinfo | grep "OpenGL version"
+```
+
+### Install GPU-specific firmware
+
+**For AMD Radeon GPUs:**
+```bash
+sudo apt install -t trixie-backports \
+    firmware-amd-graphics \
+    firmware-amd-graphics:i386 \
+    -y
+```
+
+**For Intel GPUs:**
+```bash
+# Intel VA-API driver for hardware video acceleration
+sudo apt install -t trixie-backports \
+    intel-media-va-driver \
+    intel-media-va-driver:i386 \
+    -y
+
+# For older Intel GPUs (Broadwell and earlier), use the legacy driver instead:
+# sudo apt install -t trixie-backports i965-va-driver i965-va-driver:i386 -y
 ```
 
 ## Enable NTSYNC Kernel Module
@@ -69,11 +90,14 @@ sudo modprobe ntsync
 lsmod | grep ntsync
 ```
 
-## Verify non-free video codecs
+## Verify Hardware Video Acceleration
+This verifies that VA-API hardware video acceleration is working for your AMD or Intel GPU.
 ```bash
 sudo apt install vainfo -y
 vainfo
 ```
+
+# Gaming Setup
 
 ### Install Steam
 ```bash
@@ -89,16 +113,23 @@ sudo apt install ./google-chrome-stable_current_amd64.deb -y
 ## Chrome Browser: Hardware Accelerated Video
 To help reduce power usage and make our system more efficient when watching video using Chrome, we must add some launch options.
 
-The steps below use the AMD launch options. Substitute the correct options based on your GPU model.
+These flags work for both AMD and Intel GPUs.
 
+**Manual Method:**
 ```bash
+mkdir -p ~/.local/share/applications
 cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
 nano ~/.local/share/applications/google-chrome.desktop
-
-# Look for the lines starting with Exec= and add these launch options
+```
+Look for the lines starting with `Exec=` and add these launch options after `google-chrome-stable`:
+```
 --enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks
+```
 
-# Here is a scripted method
+**Scripted Method:**
+```bash
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
 FILE_PATH=~/.local/share/applications/google-chrome.desktop
 FLAGS=" --enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks"
 sed -i 's/ --enable-features=[^ ]*//g' "$FILE_PATH"
@@ -138,7 +169,7 @@ sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub
 3. Select the **OBS Studio** Flatpak (From Flathub) package
 4. Click **Install**
 
-# Part III: KDE Desktop Tweaks
+# KDE Desktop Tweaks
 ### Set Maximum Refresh Rate for Your Display
 
 Ensuring your display is set to its maximum refresh rate is crucial for smooth gaming. Higher refresh rates provide a better gaming experience with reduced input lag and smoother motion.
@@ -149,9 +180,9 @@ Ensuring your display is set to its maximum refresh rate is crucial for smooth g
 4. Under **Refresh rate**, select the highest available option (e.g., 144 Hz, 165 Hz, 240 Hz)
 5. Click **Apply**
 
-### Enable Gsync or FreeSync
+### Enable Variable Refresh Rate (FreeSync/Adaptive Sync)
 
-To enable variable refresh rates for your games.
+To enable variable refresh rates for your games. This works with AMD FreeSync and Intel Adaptive Sync capable displays.
 
 1. Open **System Settings**
 2. Go to **Display & Monitor**
@@ -190,22 +221,12 @@ For better gaming performance, you can set your CPU governor to performance mode
 sudo apt install gamemode -y
 ```
 
-### Configure Gamemode User Permissions
-After installing Gamemode, you need to add your user to the `gamemode` group. This grants the Gamemode daemon permission to renice (prioritize) processes and change CPU power states for optimal gaming performance.
-
-Add your user to the gamemode group:
+Verify gamemode is working correctly:
 ```bash
-sudo usermod -a -G gamemode $USER
+gamemoded -t
 ```
 
-**Important:** You must log out and log back in (or reboot) for the group membership to take effect.
-
-After logging back in, verify that you're now in the gamemode group:
-```bash
-groups | grep gamemode
-```
-
-If the command returns `gamemode`, you're all set! The Gamemode daemon will now be able to optimize your system during gaming sessions.
+If the test passes, gamemode is ready to use. The daemon will automatically apply CPU governor optimizations, I/O priority adjustments, and other performance tweaks when activated.
 
 ### Enable Gamemode for Steam Games
 To enable gamemode for your Steam games, you need to add a launch option to each game:
@@ -229,8 +250,6 @@ echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 # Build and Install Gamescope
 Gamescope is a micro-compositor that can improve gaming performance by providing better frame pacing and allowing games to run at different resolutions than your display. Building from source ensures you get the latest features and optimizations.
 
-**Prerequisite:** This process requires build tools. If you followed the kernel installation steps earlier, these should already be installed.
-
 ### Install build prerequisites
 ```bash
 sudo apt install devscripts build-essential -y
@@ -245,9 +264,8 @@ dget -u https://deb.debian.org/debian/pool/contrib/g/gamescope/gamescope_3.16.15
 
 cd gamescope-*/
 
-
-sudo apt install -t trixie-backports libgbm-dev
-
+# Install backported libgbm-dev dependency
+sudo apt install -t trixie-backports libgbm-dev -y
 
 # Create and install build dependencies
 mk-build-deps
@@ -295,8 +313,10 @@ sudo apt install mangohud goverlay mangoapp -y
 Update the gamescope-session with the correct monitor resolution and refresh rate.
 ```bash
 sudo nano /usr/bin/gamescope-session
+```
 
-
+Find the `gamescope` command and update the resolution and refresh rate to match your monitor:
+```bash
 gamescope \
     $MANGOAPP_FLAG \
     -W 2560 -H 1440 -w 2560 -h 1440 -r 165 --adaptive-sync \
