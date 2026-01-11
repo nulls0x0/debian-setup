@@ -15,12 +15,17 @@ sudo dpkg --add-architecture i386
 sudo apt update && sudo apt upgrade -y
 ```
 
-### Install Latest Kernel from backports
+### Install the Latest Kernel and Firmware from Backports
 - Updated Linux Kernel is available in backports as of December 6, 2025.
 - List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
 ```bash
 sudo apt update
-sudo apt install -t trixie-backports linux-image-amd64 linux-headers-amd64 -y
+
+sudo apt install -t trixie-backports \
+    linux-image-amd64 linux-headers-amd64 \
+    firmware-linux firmware-linux-nonfree \
+    -y
+
 sudo reboot
 ```
 
