@@ -249,9 +249,22 @@ sudo modprobe ntsync
 
 # Verify the module is loaded
 lsmod | grep ntsync
+
+```
+# (Optional) Pull Backport Packages Automatically
+If you want your system to always prefer backports automatically without typing -t every time
+```bash
+cat <<EOF | sudo tee /etc/apt/preferences.d/99-backports
+Package: *
+Pin: release n=trixie-backports
+Pin-Priority: 500
+EOF
+
+sudo apt update
+sudo apt upgrade
 ```
 
-# Build and Install Gamescope
+# (Optional) Build and Install Gamescope
 Gamescope is a micro-compositor that can improve gaming performance by providing better frame pacing and allowing games to run at different resolutions than your display. Building from source ensures you get the latest features and optimizations.
 
 ### Install build prerequisites
