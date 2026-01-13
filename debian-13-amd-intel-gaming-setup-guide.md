@@ -257,7 +257,8 @@ sudo sysctl vm.swappiness=10
 echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
 ```
 # (Optional) Pull Backport Packages Automatically
-If you want your system to always prefer backports automatically without typing -t every time
+For users who want a newer kernel, driver, LibreOffice, or specific tool without breaking the system.
+Update your system to always pull backports automatically.
 ```bash
 cat <<EOF | sudo tee /etc/apt/preferences.d/99-backports
 Package: *
