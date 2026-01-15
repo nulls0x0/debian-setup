@@ -17,18 +17,31 @@ sudo dpkg --add-architecture i386
 sudo apt update && sudo apt upgrade -y
 ```
 
-### Install Latest Kernel from backports
-- Linux Kernel 6.17.8 is available as of December 6, 2025.
-- List of Backported packages for Trixie: https://packages.debian.org/trixie-backports/kernel/
-```bash
-sudo apt update
+#  Update Packages Using Backports
+Update to newer kernel, drivers, LibreOffice etc.
 
-sudo apt install -t trixie-backports \
-    linux-image-amd64 linux-headers-amd64 \
-    firmware-linux firmware-linux-nonfree \
-    -y
+```bash
+cat <<EOF | sudo tee /etc/apt/preferences.d/99-backports
+Package: *
+Pin: release n=trixie-backports
+Pin-Priority: 500
+EOF
+
+sudo apt update
+sudo apt upgrade
+sudo reboot
+```
+
+### Install Latest Firmware From Backports
+```bash
+sudo apt install -t trixie-backports firmware-linux firmware-linux-nonfree -y
 
 sudo reboot
+```
+
+### Install kernel headers and build tools
+```bash
+sudo apt install linux-headers-amd64 linux-headers-$(uname -r) build-essential dkms -y
 ```
 
 ### Add Nvidia GPG Key
@@ -48,10 +61,6 @@ echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_
 sudo apt update
 ```
 
-### Install kernel headers and build tools
-```bash
-sudo apt install linux-headers-amd64 linux-headers-$(uname -r) build-essential dkms -y
-```
 ## Identify Correct Nvidia Driver
 Based on the model of your Nvidia GPU you must install either the Nvidia "Open" or "Proprietary" driver. Do not install both drivers at the same time.
 - If you have an Nvidia Turing based GPU or newer i.e. (Geforce 16XX, 20XX, 30XX, 40XX, 50XX...), you should use the Nvidia "Open" driver.
@@ -89,36 +98,6 @@ sudo dmesg | grep nvidia
 sudo apt install steam-installer -y
 ```
 
-### Install Google Chrome
-```bash
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb -y
-```
-
-## Chrome Browser: Hardware Accelerated Video
-To help reduce power usage and make our system more efficient when watching video using Chrome, we must add some launch options.
-
-**Manual Method:**
-```bash
-mkdir -p ~/.local/share/applications
-cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
-nano ~/.local/share/applications/google-chrome.desktop
-```
-Look for the lines starting with `Exec=` and add these launch options after `google-chrome-stable`:
-```
---enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs
-```
-
-**Scripted Method:**
-```bash
-mkdir -p ~/.local/share/applications
-cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
-FILE_PATH=~/.local/share/applications/google-chrome.desktop
-FLAGS=" --enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs"
-sed -i 's/ --enable-features=[^ ]*//g' "$FILE_PATH"
-sed -i "s/^\(Exec=.*google-chrome-stable\)\(.*\)/\1${FLAGS}\2/g" "$FILE_PATH"
-```
-
 ### Install Flatpak
 ```bash
 sudo apt install flatpak plasma-discover-backend-flatpak -y
@@ -132,6 +111,12 @@ sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub
 1. Open **Discover Software Manager**
 2. In the search input enter **proton**
 3. Select the **ProtonUp-Qt** Flatpak (From Flathub) package
+4. Click **Install**
+
+### Discord (Flatpak)
+1. Open **Discover Software Manager**
+2. In the search input enter **discord**
+3. Select the **Discord** Flatpak (From Flathub) package
 4. Click **Install**
 
 ### Minecraft Launcher 'Prism Launcher' (Flatpak)
@@ -224,6 +209,36 @@ To enable gamemode for your Steam games, you need to add a launch option to each
    ```
 5. Close the properties window and launch the game
 
+# Install Google Chrome
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb -y
+```
+
+## Chrome Browser: Hardware Accelerated Video
+To help reduce power usage and make our system more efficient when watching video using Chrome, we must add some launch options.
+
+**Manual Method:**
+```bash
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
+nano ~/.local/share/applications/google-chrome.desktop
+```
+Look for the lines starting with `Exec=` and add these launch options after `google-chrome-stable`:
+```
+--enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs
+```
+
+**Scripted Method:**
+```bash
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/
+FILE_PATH=~/.local/share/applications/google-chrome.desktop
+FLAGS=" --enable-features=AcceleratedVideoDecodeLinuxZeroCopyGL,AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks,VaapiOnNvidiaGPUs"
+sed -i 's/ --enable-features=[^ ]*//g' "$FILE_PATH"
+sed -i "s/^\(Exec=.*google-chrome-stable\)\(.*\)/\1${FLAGS}\2/g" "$FILE_PATH"
+```
+
 # System tweaks
 
 ### Makes the system prefer using RAM over disk swap
@@ -250,20 +265,6 @@ sudo modprobe ntsync
 # Verify the module is loaded
 lsmod | grep ntsync
 
-```
-# (Optional) Pull Backport Packages Automatically
-For users who want a newer kernel, driver, LibreOffice, or specific tool without breaking the system.
-Update your system to always pull backports automatically.
-
-```bash
-cat <<EOF | sudo tee /etc/apt/preferences.d/99-backports
-Package: *
-Pin: release n=trixie-backports
-Pin-Priority: 500
-EOF
-
-sudo apt update
-sudo apt upgrade
 ```
 
 # (Optional) Build and Install Gamescope
